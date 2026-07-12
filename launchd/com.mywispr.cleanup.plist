@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Daily audio cleanup for MyWispr. Calls bash run.sh directly (not via
+         the app bundle) because --cleanup-only cannot be passed through an
+         app launch. The cleanup path only writes to the app-support directory,
+         so no TCC prompt occurs.
+
+         This file is a template — do not load it directly. scripts/setup.sh
+         renders __RUN_SH_PATH__ to the actual path and installs it at:
+           ~/Library/LaunchAgents/com.mywispr.cleanup.plist -->
+    <key>Label</key>
+    <string>com.mywispr.cleanup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__RUN_SH_PATH__</string>
+        <string>--cleanup-only</string>
+    </array>
+
+    <!-- Daily at 03:30; launchd runs missed jobs at next wake -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/com.mywispr.cleanup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/com.mywispr.cleanup.log</string>
+</dict>
+</plist>

@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.DS_Store
+.pytest_cache/
+
+# Binary (rebuilt from trampoline.c)
+scripts/trampoline
+
+# Development artifacts
+audit/
+session-logs/
+lessons-learned/
+test_record_transcribe.py
