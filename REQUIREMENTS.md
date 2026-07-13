@@ -60,7 +60,7 @@ Hold or double-tap a hotkey → speak → release → transcript is auto-pasted 
 ### 5. Clipboard Fallback
 
 - The most recent transcript is always on the clipboard
-- Menu bar dropdown shows the last N transcripts (default: 10) with a "Copy" button for each
+- Menu bar dropdown shows the last N transcripts (default: 20) with a "Copy" option for each
 - Allows retrieval if the user accidentally clicked away before the paste landed
 
 ### 6. Disfluency Removal
@@ -73,18 +73,18 @@ Hold or double-tap a hotkey → speak → release → transcript is auto-pasted 
 
 ### 7. Menu Bar App
 
-- Lives in the macOS menu bar (no Dock icon)
+- Lives in the macOS menu bar (ideally no Dock icon)
 - Status indicator changes by state:
   - **Idle**: default icon
-  - **Recording**: animated / colored icon
-  - **Processing**: spinner or distinct icon
+  - **Recording**: animated icon
+  - **Processing**: distinct icon
   - **Permission needed**: distinct state shown when Microphone or Accessibility permission is missing, with a menu item linking to System Settings
   - **Model needed**: distinct state shown when neither the MacWhisper model nor the MyWispr-owned model is available, with menu items to install/download or choose a model file
 - App checks for required permissions at launch and shows the appropriate degraded state before any recording or paste failure can occur
 - App checks for model availability at launch before recording can begin
 - Permission checks may use different implementation paths: Accessibility can be checked with macOS Accessibility APIs or a controlled System Events probe; Microphone may require an actual audio permission-triggering check rather than a simple boolean
 - Dropdown menu includes:
-  - Recent transcripts (last 10) with Copy buttons
+  - Recent transcripts (last X) with ability to copy
   - Search Transcripts
   - Settings
   - Quit
@@ -95,7 +95,7 @@ Hold or double-tap a hotkey → speak → release → transcript is auto-pasted 
   - `~/Library/Application Support/MyWispr/transcripts.db`
   - Schema: `id`, `timestamp`, `duration_sec`, `language`, `audio_file` (nullable), `raw_text`, `cleaned_text`
 - Transcripts are **never** automatically deleted
-- Simple v1 search UI filters by keyword; date range can remain a database capability or post-v1 UI improvement
+- Simple v1 search UI filters by keyword and date range.
 
 ### 9. Automated Audio Cleanup
 
@@ -118,7 +118,7 @@ Accessible from the menu bar via `rumps` dialogs and menu flows (no WebKit windo
 | Disfluency list | (see §6) | Editable list |
 | LLM cleanup | — | Post-v1; not in settings for v1 |
 | Audio retention | 30 days | Days before audio deleted |
-| Recent transcripts shown | 10 | Menu bar history count |
+| Recent transcripts shown | 20 | Menu bar history count |
 
 ---
 
@@ -157,7 +157,7 @@ Permission attribution follows the app-wrapper bash-indirection pattern:
 - The launchd cleanup plist invokes `bash run.sh --cleanup-only` directly (an app launch cannot carry the flag); this is safe because cleanup only touches `~/Library/Application Support`, which is not TCC-protected — but the install root itself must be outside `~/Documents`, or launchd's bash access to the script trips the TCC Documents prompt.
 - The shipped v1 artifact is the bundle plus its local Python runtime/dependencies and support files at `~/Library/Application Support/MyWispr/app/`; `py2app` is not part of v1 packaging.
 
-**Rationale for packaging decision:** the wrapper must be the single shipped app identity that users grant permissions to, while `run.sh` controls the Python entrypoint underneath. v1 M1–M6 used an Automator Application for this (the previously documented pattern), but Automator displays a permanent gear/progress menu item while the workflow runs, and its ⓧ button terminates the app. The hand-rolled bundle keeps the identical TCC mechanics without that artifact, requires no Xcode or signing for personal distribution, and was adopted at M7. Do not reintroduce the Automator wrapper or `py2app` for v1.
+**Rationale for packaging decision:** the wrapper must be the single shipped app identity that users grant permissions to, while `run.sh` controls the Python entrypoint underneath. The original v1 M1–M6 used an Automator Application for this (the previously documented pattern), but Automator displays a permanent gear/progress menu item while the workflow runs, and its ⓧ button terminates the app. The hand-rolled bundle keeps the identical TCC mechanics without that artifact, requires no Xcode or signing for personal distribution, and was adopted at M7. Do not reintroduce the Automator wrapper or `py2app` for v1.
 
 ---
 
