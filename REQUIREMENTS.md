@@ -46,7 +46,6 @@ Hold or double-tap a hotkey → speak → release → transcript is auto-pasted 
   - If no model is available, the app enters a model-needed state and offers a user-facing path to install/download a local model or select an existing compatible model file
   - Transcription remains fully local after the model is available; first-run model acquisition may require a bundled base-model asset, separate installer, or download flow
   - Model path remains user-overridable in settings
-  - Note: NVIDIA Parakeet v3 is present on this machine but only as CoreML bundles (WhisperKit format) — incompatible with pywhispercpp
 - **Language**: user-selectable with auto-detect as the default
 
 **Rationale for model-source behavior:** The original plan assumed MacWhisper was installed and that MyWispr could reuse its downloaded Whisper turbo model. That is valid on the developer machine but not for friends/family who may not have MacWhisper. MyWispr must therefore treat MacWhisper reuse as an optimization, not a requirement. For v1 shared installs, Whisper base is the default because it is much smaller and makes the app easier to distribute; Whisper turbo remains the preferred quality upgrade when already present or installed later.
