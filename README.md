@@ -10,12 +10,7 @@ All audio and transcripts are stored locally. Transcription uses [whisper.cpp](h
 
 ## Status
 
-| Milestone | Status |
-|---|---|
-| M1–M7: Core app + .app bundle | ✅ Complete |
-| M8: Dialog UX fixes | ✅ Complete |
-| M9: Search improvements + custom vocabulary | ✅ Complete |
-| M10: First real install on a second machine | 🔜 Next |
+v1 feature-complete. Core app, .app bundle, dialog UX, search, and custom vocabulary are all shipped and working on the developer machine. Next up: validating the install experience on a second machine (M10 — Gatekeeper friction, Intel compatibility, INSTALL.md end-to-end with a non-technical user).
 
 ## For end users
 
@@ -135,6 +130,8 @@ Tests cover: settings round-trip, db insert/query/search/date-boundary math, dis
 - `REQUIREMENTS.md` — what to build and why; source of truth on any conflict
 - `IMPLEMENTATION_PLAN.md` — resolved design decisions and milestone history; explains the reasoning behind non-obvious choices
 - `CLAUDE.md` — project instructions for AI-assisted development; mirrors the key decisions above
+
+> **Note on planning documents:** `IMPLEMENTATION_PLAN.md`, `REQUIREMENTS.md`, and `CLAUDE.md` are published intentionally as a transparent build record. They document how this project was designed and built — including the AI-assisted development process — in the hope that others building similar tools find the decisions and tradeoffs useful. They are not polished end-user documentation.
 
 ### Out of scope for v1
 

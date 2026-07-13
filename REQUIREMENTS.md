@@ -151,7 +151,7 @@ Three permissions required, all granted once around first launch/first use:
 
 Permission attribution follows the app-wrapper bash-indirection pattern:
 
-- `MyWispr.app` is a hand-rolled minimal bundle: `Contents/MacOS/MyWispr` is a bash script that calls `bash run.sh` → which invokes Python. `Info.plist` sets `LSUIElement` true (no Dock icon) and a stable `CFBundleIdentifier`.
+- `MyWispr.app` is a hand-rolled minimal bundle: `Contents/MacOS/MyWispr` is a precompiled Mach-O trampoline (universal arm64+x86_64) that `execv`s `bash run.sh` → which invokes Python. `Info.plist` sets `LSUIElement` true (no Dock icon), `LSRequiresNativeExecution` true, and a stable `CFBundleIdentifier`.
 - The bundle executable must call `bash run.sh`, never Python directly — otherwise TCC attributes prompts to Python instead of MyWispr.
 - User grants the permissions to `MyWispr.app` in System Settings → Privacy & Security; TCC prompts show "MyWispr would like to…" rather than a Python process name.
 - The launchd cleanup plist invokes `bash run.sh --cleanup-only` directly (an app launch cannot carry the flag); this is safe because cleanup only touches `~/Library/Application Support`, which is not TCC-protected — but the install root itself must be outside `~/Documents`, or launchd's bash access to the script trips the TCC Documents prompt.
@@ -189,11 +189,13 @@ Permission attribution follows the app-wrapper bash-indirection pattern:
 
 ---
 
-## Project Structure (Planned)
+## Project Structure
 
 ```
 MyWispr/
 ├── REQUIREMENTS.md         ← this file
+├── IMPLEMENTATION_PLAN.md  ← build history and design decisions
+├── INSTALL.md              ← end-user install guide
 ├── CLAUDE.md               ← project instructions for Claude Code
 ├── src/
 │   ├── main.py             ← entry point, menu bar app
@@ -207,9 +209,10 @@ MyWispr/
 │   └── cleanup.py          ← audio file cleanup logic
 ├── launchd/
 │   └── com.mywispr.cleanup.plist
-├── automator/
-│   └── build-app.md        ← instructions for building the Automator wrapper
 ├── scripts/
-│   └── run.sh              ← app launcher invoked by Automator
+│   ├── trampoline.c        ← Mach-O bundle executable source
+│   ├── build-app.sh        ← generates /Applications/MyWispr.app
+│   ├── setup.sh            ← creates venv, installs deps, installs launchd plist
+│   └── run.sh              ← app entrypoint (exec'd by the trampoline)
 └── requirements.txt
 ```
