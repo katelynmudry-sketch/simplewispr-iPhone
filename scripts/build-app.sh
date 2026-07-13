@@ -73,11 +73,17 @@ PLIST
 # The trampoline calls execv("/bin/bash", run_sh_path, argv...) so the bash
 # parent stays alive, preserving TCC attribution to MyWispr.app.
 # Source: scripts/trampoline.c  Binary: scripts/trampoline (universal arm64+x86_64)
-TRAMPOLINE="$(cd "$(dirname "$0")" && pwd)/trampoline"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TRAMPOLINE="$SCRIPT_DIR/trampoline"
+TRAMPOLINE_SRC="$SCRIPT_DIR/trampoline.c"
 if [ ! -f "$TRAMPOLINE" ]; then
-    echo "ERROR: trampoline binary not found at $TRAMPOLINE"
-    echo "       Rebuild it: cc -arch arm64 -arch x86_64 -o scripts/trampoline scripts/trampoline.c"
-    exit 1
+    echo "trampoline binary not found — compiling from source..."
+    if [ ! -f "$TRAMPOLINE_SRC" ]; then
+        echo "ERROR: trampoline.c not found at $TRAMPOLINE_SRC"
+        exit 1
+    fi
+    cc -arch arm64 -arch x86_64 -o "$TRAMPOLINE" "$TRAMPOLINE_SRC"
+    echo "Compiled $TRAMPOLINE"
 fi
 EXEC="$APP/Contents/MacOS/MyWispr"
 cp "$TRAMPOLINE" "$EXEC"

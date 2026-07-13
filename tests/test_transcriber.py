@@ -147,11 +147,12 @@ def test_build_initial_prompt_preserves_case():
     assert result == "Glossary: iPhone, MacBook, WiFi"
 
 
-# Dev machine: discovery resolves to MacWhisper turbo with no user config
+# Requires a MacWhisper turbo model on disk. Opt in with MYWISPR_DEV_MACHINE=1.
+@pytest.mark.skipif(
+    not __import__("os").environ.get("MYWISPR_DEV_MACHINE"),
+    reason="dev-machine only — set MYWISPR_DEV_MACHINE=1 to run",
+)
 def test_dev_machine_finds_macwhisper_turbo():
-    """On this machine, no user config → should resolve to MacWhisper turbo."""
     result = discover()
     assert result is not None, "Expected a model on the dev machine"
-    assert "whisper-turbo" in result or "turbo" in result.lower(), (
-        f"Expected turbo model, got: {result}"
-    )
+    assert "turbo" in result.lower(), f"Expected turbo model, got: {result}"
