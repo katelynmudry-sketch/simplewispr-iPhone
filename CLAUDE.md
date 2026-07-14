@@ -83,8 +83,16 @@ WisprFlow uses on iOS. Key decisions (see `ios/README.md` for full rationale):
   fields the extension needs (disfluency list, language).
 - **Not yet built**: transcript history/SQLite on iOS, hold-to-talk, a language-picker UI.
   These are reasonable follow-ups, not implemented in this v1.
-- This code has not been compiled or run — it was written from an environment without
-  Xcode/a Mac. Treat the first Xcode build as the real test.
+- **Status: actively in progress, on-device testing pending.** Originally written from
+  an environment without Xcode/a Mac, so it didn't compile on the first attempt — two
+  real bugs surfaced once CI actually ran it: the runner's default Xcode couldn't open
+  a project XcodeGen's newer version generated (fixed by selecting the newest available
+  Xcode in `build-ios-ipa.yml`), and `SharedSettings.swift` originally lived in
+  `MyWispr/` where the keyboard extension target couldn't see it across the module
+  boundary (fixed by moving it to `Shared/`). Both Xcode and CI builds succeed as of
+  workflow run #3. What's unverified: installing the built app on a physical iPhone,
+  granting mic/speech permissions, and confirming dictation + cleanup actually insert
+  text at the cursor.
 - **Distribution — two paths, not the App Store**: (1) Xcode on a Mac, straight to a
   device over USB/WiFi — the only path to TestFlight too, since that needs App Store
   Connect access. (2) `.github/workflows/build-ios-ipa.yml` builds an unsigned `.ipa`

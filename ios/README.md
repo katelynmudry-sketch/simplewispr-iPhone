@@ -6,6 +6,31 @@ Mac app's global hotkey + "paste at cursor in any app" behavior. A custom keyboa
 sidesteps that: once enabled, you switch to it inside any app's text field, tap
 the mic, speak, and the cleaned-up text is typed directly into that field.
 
+**Status: actively in progress, on-device testing pending.** Both build paths
+succeed — Xcode/XcodeGen and the CI workflow (`.github/workflows/build-ios-ipa.yml`,
+which produces a sideload-ready unsigned `.ipa`; see run history in the Actions tab).
+What hasn't been verified yet is the app actually working on a physical iPhone. See
+the checklist below.
+
+### On-device testing checklist (not yet done)
+
+- [ ] Sideload the CI-built `.ipa` via AltStore/SideStore and confirm install succeeds
+      (including the App Group entitlement — see the free-account caveat above)
+- [ ] Add the MyWispr keyboard in Settings → Keyboard → Keyboards
+- [ ] Grant "Allow Full Access" and confirm the mic/speech-recognition permission
+      prompts appear and can be granted
+- [ ] Tap the mic in another app's text field, speak, and confirm on-device
+      transcription runs
+- [ ] Confirm the disfluency cleanup pass runs and cleaned-up text is inserted at the
+      cursor correctly
+- [ ] Confirm the host app's word-list editor changes are picked up by the extension
+      via the shared App Group
+
+Two real build bugs were already found and fixed via this process (see commit
+history): a CI-runner Xcode version mismatch, and `SharedSettings.swift` being
+invisible to the extension target across the Swift module boundary. Expect more of
+this kind of thing on first device install — treat it as the real test.
+
 ## What this is (and isn't)
 
 - **Transcription**: Apple's on-device `SFSpeechRecognizer` (`requiresOnDeviceRecognition
@@ -72,8 +97,11 @@ something to verify on your first build, not a promise.
   - Known AltStore/SideStore constraint: free Apple IDs are historically limited to a
     handful of sideloaded apps active at once (Apple caps free-tier certificates), so
     this may compete with other sideloaded apps on the same phone.
-  - This workflow hasn't been run end-to-end (written with no Mac available to test
-    it) — treat the first run as the real test, same as the rest of this project.
+  - **CI build confirmed working** as of workflow run #3 (see the Actions tab for
+    current status) — it compiles and produces a downloadable `.ipa`. What's still
+    unverified is the sideload-and-run step: installing that `.ipa` via
+    AltStore/SideStore and confirming the keyboard actually works on a physical
+    device. Treat that as the real remaining test.
 
 ## Project layout
 
