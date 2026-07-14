@@ -21,6 +21,7 @@ targets:
     platform: iOS
     sources:
       - MyWispr
+      - Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.mywispr.ios
