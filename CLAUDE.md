@@ -85,6 +85,15 @@ WisprFlow uses on iOS. Key decisions (see `ios/README.md` for full rationale):
   These are reasonable follow-ups, not implemented in this v1.
 - This code has not been compiled or run — it was written from an environment without
   Xcode/a Mac. Treat the first Xcode build as the real test.
+- **Distribution — two paths, not the App Store**: (1) Xcode on a Mac, straight to a
+  device over USB/WiFi — the only path to TestFlight too, since that needs App Store
+  Connect access. (2) `.github/workflows/build-ios-ipa.yml` builds an unsigned `.ipa`
+  in CI with zero Apple secrets, meant to be sideloaded via AltStore/SideStore, which
+  re-sign it locally using the installer's own Apple ID. This is what makes the repo
+  buildable by anyone who forks it without owning a Mac. Bundle IDs and the App Group
+  ID (`group.com.mywispr.ios`) are global across all Apple developer accounts — anyone
+  building their own copy under a different Apple ID must change `com.mywispr` to
+  something unique first (see `ios/project.yml`'s top comment and `ios/README.md`).
 
 ## Full requirements
 

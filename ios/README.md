@@ -29,6 +29,52 @@ the mic, speak, and the cleaned-up text is typed directly into that field.
 - **No cloud dependency**, matching the Mac app's core principle — both speech
   recognition and cleanup run entirely on-device.
 
+## Before you build: personalize the identifiers
+
+Bundle IDs and App Group IDs are unique across *all* of Apple's developer accounts,
+not just within one account — if two people both try to register `com.mywispr.ios`
+under their own separate Apple IDs, the second one fails. If you're building your own
+copy (rather than the original author's), first replace every `com.mywispr` in
+`ios/project.yml` (the `bundleIdPrefix`, both `PRODUCT_BUNDLE_IDENTIFIER` values, and
+the `group.com.mywispr.ios` App Group string in both targets) with something unique to
+you, e.g. `com.yourname.mywispr`.
+
+**Free Apple ID caveat**: App Groups (used here so the host app and keyboard extension
+can share the disfluency word list) have historically required a paid Apple Developer
+Program membership — Xcode's automatic signing tends to reject adding the App Groups
+capability under a free "Personal Team." If you only have a free Apple ID and hit this,
+sideloading via AltStore/SideStore (below) may still work since they provision
+capabilities differently than Xcode's UI, but it isn't guaranteed — treat it as
+something to verify on your first build, not a promise.
+
+## Two ways to build this
+
+- **You have a Mac**: use Xcode directly (steps below). This is also the only path to
+  TestFlight, since uploading to App Store Connect requires a real Apple Developer
+  account signed in on an actual Mac at some point.
+- **You don't have a Mac**: use the GitHub Actions workflow
+  (`.github/workflows/build-ios-ipa.yml`) plus AltStore or SideStore. This produces an
+  **unsigned** `.ipa` in the cloud — no Apple credentials or secrets needed in CI at
+  all, because AltStore/SideStore re-sign the app locally on your own computer using
+  your own Apple ID at install time, not at build time. That also means every fork of
+  this repo can run the workflow as-is.
+  1. On GitHub, go to your fork's **Actions** tab → **Build unsigned iOS IPA** →
+     **Run workflow**.
+  2. When it finishes, download the `MyWispr-unsigned-ipa` artifact.
+  3. Install [AltStore](https://altstore.io) or [SideStore](https://sidestore.io) on
+     your iPhone (both have their own setup docs — SideStore doesn't need a companion
+     computer running at all times, AltStore's classic flow needs AltServer running on
+     a Windows/Mac machine occasionally to refresh signing).
+  4. Use AltStore/SideStore to install the downloaded `.ipa` — it handles signing with
+     your own Apple ID during that step.
+  5. Same 7-day-expiry caveat as the free-account Xcode path applies unless you're
+     signing with a paid Developer Program account through AltServer.
+  - Known AltStore/SideStore constraint: free Apple IDs are historically limited to a
+    handful of sideloaded apps active at once (Apple caps free-tier certificates), so
+    this may compete with other sideloaded apps on the same phone.
+  - This workflow hasn't been run end-to-end (written with no Mac available to test
+    it) — treat the first run as the real test, same as the rest of this project.
+
 ## Project layout
 
 ```
@@ -40,7 +86,7 @@ ios/
   MyWisprTests/            Unit tests porting tests/test_postprocess.py's cases
 ```
 
-## Build it (requires a Mac + Xcode — cannot be done from this environment)
+## Build with Xcode (the Mac path)
 
 This project was written and committed from a Linux container with no Xcode, no iOS
 Simulator, and no way to compile or run Swift code. Everything below is written against
@@ -75,6 +121,17 @@ setting) that only surface in Xcode.
 6. Test it: open Notes or Messages, tap-and-hold the globe key on the keyboard, pick
    MyWispr, tap the mic, say something, tap again to stop. Cleaned-up text should land
    at the cursor.
+
+### Sharing it with a small group via TestFlight
+
+If you have a paid Apple Developer Program account and want family/friends to install
+this without sideloading tools, TestFlight is the path — it's still not the App Store
+(no public listing, no full review, just a light Beta App Review for external testers
+that's typically approved within a day). This requires Xcode on a Mac: Product →
+Archive, then distribute the archive to App Store Connect, create a TestFlight group,
+and add testers by email — they install the TestFlight app and accept an invite. Builds
+expire after 90 days and need re-uploading periodically. This isn't automated by
+anything in this repo yet; it's a manual Xcode/App Store Connect flow each time.
 
 ## Why not whisper.cpp / WhisperKit on iOS
 

@@ -1,3 +1,9 @@
+# Before building your own copy: bundle identifiers and App Group IDs are
+# global across all of Apple's developer accounts, so if you fork this repo
+# to build it under your own Apple ID, change every `com.mywispr` below
+# (bundleIdPrefix, both PRODUCT_BUNDLE_IDENTIFIER values, and the
+# `group.com.mywispr.ios` App Group string in both targets' entitlements) to
+# something unique to you, e.g. `com.yourname.mywispr`. See ios/README.md.
 name: MyWispr
 options:
   bundleIdPrefix: com.mywispr
