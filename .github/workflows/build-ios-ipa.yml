@@ -1,0 +1,59 @@
+name: Build unsigned iOS IPA
+
+# Manual trigger only — this is meant for anyone who forks the repo and wants
+# a build without owning a Mac. See ios/README.md, "Build without a Mac" section.
+#
+# Produces an UNSIGNED .ipa. It intentionally does not use any Apple
+# credentials/secrets — AltStore/SideStore re-sign the app locally at install
+# time using the installing user's own Apple ID, so the CI build doesn't need
+# to know about anyone's developer account. This also means every fork of
+# this repo can run this workflow as-is, with no per-fork secrets to configure.
+#
+# This has not been run/verified end to end (written from an environment with
+# no Mac available). CODE_SIGNING_ALLOWED=NO + AD_HOC_CODE_SIGNING_ALLOWED=YES
+# is a known community pattern for producing AltStore-installable unsigned
+# IPAs, but treat the first run of this workflow as the real test.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Build unsigned archive
+        working-directory: ios
+        run: |
+          xcodebuild archive \
+            -project MyWispr.xcodeproj \
+            -scheme MyWispr \
+            -archivePath build/MyWispr.xcarchive \
+            -destination "generic/platform=iOS" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Package unsigned .ipa
+        working-directory: ios
+        run: |
+          mkdir -p build/Payload
+          cp -R build/MyWispr.xcarchive/Products/Applications/MyWispr.app build/Payload/
+          cd build && zip -r MyWispr-unsigned.ipa Payload
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyWispr-unsigned-ipa
+          path: ios/build/MyWispr-unsigned.ipa
+          retention-days: 14

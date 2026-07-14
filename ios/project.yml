@@ -1,0 +1,94 @@
+# Before building your own copy: bundle identifiers and App Group IDs are
+# global across all of Apple's developer accounts, so if you fork this repo
+# to build it under your own Apple ID, change every `com.mywispr` below
+# (bundleIdPrefix, both PRODUCT_BUNDLE_IDENTIFIER values, and the
+# `group.com.mywispr.ios` App Group string in both targets' entitlements) to
+# something unique to you, e.g. `com.yourname.mywispr`. See ios/README.md.
+name: MyWispr
+options:
+  bundleIdPrefix: com.mywispr
+  deploymentTarget:
+    iOS: "16.0"
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ""  # set in Xcode: select each target -> Signing & Capabilities -> Team
+    SWIFT_VERSION: "5.0"
+
+targets:
+  MyWispr:
+    type: application
+    platform: iOS
+    sources:
+      - MyWispr
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mywispr.ios
+        PRODUCT_NAME: MyWispr
+        TARGETED_DEVICE_FAMILY: "1"  # iPhone only
+    info:
+      path: MyWispr/Info.plist
+      properties:
+        CFBundleDisplayName: MyWispr
+        UILaunchScreen: {}
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: MyWispr/MyWispr.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.mywispr.ios
+    dependencies:
+      - target: MyWisprKeyboard
+        embed: true
+
+  MyWisprKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - MyWisprKeyboard
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mywispr.ios.keyboard
+        PRODUCT_NAME: MyWisprKeyboard
+        TARGETED_DEVICE_FAMILY: "1"
+    info:
+      path: MyWisprKeyboard/Info.plist
+      properties:
+        CFBundleDisplayName: MyWispr
+        NSMicrophoneUsageDescription: "The MyWispr keyboard uses the microphone to transcribe what you say. Everything happens on-device — audio never leaves your phone."
+        NSSpeechRecognitionUsageDescription: "The MyWispr keyboard uses on-device speech recognition to turn what you say into text."
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.keyboard-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController
+          NSExtensionAttributes:
+            IsASCIICapable: false
+            PrefersRightToLeft: false
+            PrimaryLanguage: en-US
+            RequestsOpenAccess: true
+    entitlements:
+      path: MyWisprKeyboard/MyWisprKeyboard.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.mywispr.ios
+
+  MyWisprTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - MyWisprTests
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mywispr.ios.tests
+
+schemes:
+  MyWispr:
+    build:
+      targets:
+        MyWispr: all
+        MyWisprKeyboard: all
+        MyWisprTests: [test]
+    test:
+      targets:
+        - MyWisprTests
