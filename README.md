@@ -1,5 +1,7 @@
 # MyWispr
 
+> **This is a fork** of [WomenDefiningAI/SimpleWispr](https://github.com/WomenDefiningAI/SimpleWispr) (originally created by WDAI member @mdy0). The macOS app described below is unchanged from upstream. This fork adds a **separate iOS companion app** — a custom keyboard extension, not a port, with a significantly different architecture — that doesn't exist in the original repo. See [`ios/README.md`](ios/README.md) for the iOS-specific details, and the iOS note under [Status](#status) below for where that stands.
+
 A macOS menu-bar push-to-talk transcription tool inspired by [WisprFlow](https://wisprflow.ai). Hold a hotkey, speak, release — your words appear at the cursor. Fully local, no cloud dependency, no NVIDIA GPU required.
 
 ## How it works
