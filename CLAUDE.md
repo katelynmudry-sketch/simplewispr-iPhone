@@ -54,6 +54,38 @@ macOS push-to-talk voice transcription app. Inspired by WisprFlow. Python-based,
 
 - None. Default hotkey is Right Option; users can change it in settings if it conflicts.
 
+## iOS companion (keyboard extension)
+
+Lives entirely under `ios/`; does not touch the Mac app's Python source. iOS has no
+equivalent of a global hotkey or "paste at cursor in any app," so this is not a port —
+it's a separate app shipped as a **custom keyboard extension**, the same mechanism
+WisprFlow uses on iOS. Key decisions (see `ios/README.md` for full rationale):
+
+- **Transcription**: Apple's on-device `SFSpeechRecognizer` (`requiresOnDeviceRecognition
+  = true`), not whisper.cpp/`pywhispercpp`. A keyboard extension's memory cap (~30–80MB)
+  can't fit a bundled Whisper model; Apple's Speech framework runs as a system service
+  instead, so it doesn't count against that budget. Do not try to bundle whisper.cpp or
+  WhisperKit into the keyboard extension target — it belongs only in a possible future
+  standalone-app target, not the extension.
+- **Cleanup**: deterministic disfluency stripping only (`ios/Shared/DisfluencyCleaner.swift`,
+  a manual port of `src/postprocess.py` — keep them in sync). No LLM formatting pass:
+  Apple's on-device Foundation Models framework requires an A17 Pro chip or later
+  (iPhone 15 Pro+), which rules it out for the reference device (iPhone 13). Do not wire
+  up a cloud LLM call for formatting — that breaks the no-cloud-dependency principle.
+- **Trigger**: tap-to-toggle on the extension's mic button, not hold-to-talk and not a
+  hardware hotkey (iOS keyboard extensions can't listen for hardware keys).
+- **Project generation**: `ios/project.yml` (XcodeGen) is the source of truth for the
+  Xcode project, not a hand-maintained `.xcodeproj`. Regenerate with `xcodegen generate`
+  after editing it.
+- **Settings sharing**: host app and extension share settings via an App Group
+  (`group.com.mywispr.ios`) and `UserDefaults(suiteName:)`, read through
+  `SharedSettings.swift` — mirrors the Mac app's `settings.py` shape but only carries the
+  fields the extension needs (disfluency list, language).
+- **Not yet built**: transcript history/SQLite on iOS, hold-to-talk, a language-picker UI.
+  These are reasonable follow-ups, not implemented in this v1.
+- This code has not been compiled or run — it was written from an environment without
+  Xcode/a Mac. Treat the first Xcode build as the real test.
+
 ## Full requirements
 
 See `REQUIREMENTS.md` in this directory.
