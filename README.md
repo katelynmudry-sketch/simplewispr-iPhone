@@ -12,6 +12,8 @@ All audio and transcripts are stored locally. Transcription uses [whisper.cpp](h
 
 v1 feature-complete. Core app, .app bundle, dialog UX, search, and custom vocabulary are all shipped and working on the developer machine. Next up: validating the install experience on a second machine (M10 — Gatekeeper friction, Intel compatibility, INSTALL.md end-to-end with a non-technical user).
 
+**iOS companion — actively in progress, on-device testing pending.** A separate iPhone app (custom keyboard extension, not a port — see `ios/README.md`) builds successfully both via Xcode and via CI ([`build-ios-ipa.yml` run history](../../actions/workflows/build-ios-ipa.yml), producing a sideload-ready unsigned `.ipa`). It has not yet been verified end-to-end on a physical device — installing the keyboard, granting permissions, and confirming dictation + cleanup actually insert text correctly all remain to be checked. See `ios/README.md`'s status note for the checklist.
+
 ## For end users
 
 See [INSTALL.md](INSTALL.md) — step-by-step from a fresh machine to a working first transcription, including model download and permissions.
