@@ -24,6 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select latest available Xcode
+        # The macos-14 runner defaults xcode-select to an older Xcode (15.4)
+        # than what a freshly brew-installed XcodeGen targets, which fails
+        # with "future Xcode project file format" when opening the generated
+        # .xcodeproj. Point at whichever Xcode_*.app is newest instead of
+        # relying on the runner's default.
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)"
+          xcodebuild -version
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
