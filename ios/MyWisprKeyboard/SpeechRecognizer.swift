@@ -57,8 +57,13 @@ final class SpeechRecognizer: NSObject {
         request.requiresOnDeviceRecognition = true
         self.request = request
 
+        // .record + .measurement + .duckOthers asks for stricter exclusive control of the
+        // shared audio session than an app extension (as opposed to the containing app) is
+        // reliably granted -- it was failing with AVAudioSessionErrorCodeUnspecified ('what')
+        // on setActive. .playAndRecord + .default + .mixWithOthers is the gentler combination
+        // extensions have better luck with.
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+        try audioSession.setCategory(.playAndRecord, mode: .default, options: .mixWithOthers)
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
         let inputNode = audioEngine.inputNode
