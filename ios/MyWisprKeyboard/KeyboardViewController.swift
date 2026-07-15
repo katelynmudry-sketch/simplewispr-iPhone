@@ -43,6 +43,7 @@ final class KeyboardViewController: UIInputViewController {
         statusLabel.textAlignment = .center
         statusLabel.font = .preferredFont(forTextStyle: .footnote)
         statusLabel.textColor = .secondaryLabel
+        statusLabel.numberOfLines = 2
         view.addSubview(statusLabel)
 
         backspaceButton.translatesAutoresizingMaskIntoConstraints = false
@@ -132,9 +133,13 @@ final class KeyboardViewController: UIInputViewController {
     }
 
     private func handleError(_ error: Error) {
+        // Surfaces the raw domain/code (not just a friendly message) while on-device
+        // testing is still turning up new failure modes — revert to a plain message
+        // once recognition is verified working end-to-end.
         isRecording = false
         micButton.backgroundColor = .systemBlue
-        statusLabel.text = "Couldn't transcribe — try again"
+        let nsError = error as NSError
+        statusLabel.text = "\(nsError.domain) (\(nsError.code)) — try again"
     }
 
     @objc private func backspaceTapped() {
