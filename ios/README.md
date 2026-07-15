@@ -26,10 +26,16 @@ the checklist below.
 - [ ] Confirm the host app's word-list editor changes are picked up by the extension
       via the shared App Group
 
-Two real build bugs were already found and fixed via this process (see commit
-history): a CI-runner Xcode version mismatch, and `SharedSettings.swift` being
-invisible to the extension target across the Swift module boundary. Expect more of
-this kind of thing on first device install — treat it as the real test.
+Three real bugs were already found and fixed via this process (see commit
+history): a CI-runner Xcode version mismatch, `SharedSettings.swift` being
+invisible to the extension target across the Swift module boundary, and the
+keyboard extension crashing on launch with a TCC abort ("attempted to access
+privacy-sensitive data without a usage description") — `NSMicrophoneUsageDescription`
+and `NSSpeechRecognitionUsageDescription` were only declared on the
+`MyWisprKeyboard` extension's Info.plist, but iOS resolves these prompts against
+the *containing app's* Info.plist too, so they had to be added to the `MyWispr`
+host app's Info.plist in `project.yml` as well. Expect more of this kind of thing
+on first device install — treat it as the real test.
 
 ## What this is (and isn't)
 

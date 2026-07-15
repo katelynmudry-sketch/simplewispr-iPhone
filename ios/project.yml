@@ -33,6 +33,8 @@ targets:
         CFBundleDisplayName: MyWispr
         UILaunchScreen: {}
         ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: "The MyWispr keyboard uses the microphone to transcribe what you say. Everything happens on-device -- audio never leaves your phone."
+        NSSpeechRecognitionUsageDescription: "The MyWispr keyboard uses on-device speech recognition to turn what you say into text."
     entitlements:
       path: MyWispr/MyWispr.entitlements
       properties:
@@ -57,7 +59,7 @@ targets:
       path: MyWisprKeyboard/Info.plist
       properties:
         CFBundleDisplayName: MyWispr
-        NSMicrophoneUsageDescription: "The MyWispr keyboard uses the microphone to transcribe what you say. Everything happens on-device — audio never leaves your phone."
+        NSMicrophoneUsageDescription: "The MyWispr keyboard uses the microphone to transcribe what you say. Everything happens on-device -- audio never leaves your phone."
         NSSpeechRecognitionUsageDescription: "The MyWispr keyboard uses on-device speech recognition to turn what you say into text."
         NSExtension:
           NSExtensionPointIdentifier: com.apple.keyboard-service
